@@ -224,7 +224,7 @@ class BaseServer:
 		<title>%(title)s</title>
 	</head>
 	<body>
-		<h2> %(directory)s</h2>
+		<p>Directory: <b> %(directory)s</b></p>
 		<hr>
 		%(body)s
 	</body>
