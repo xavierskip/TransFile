@@ -41,7 +41,7 @@ class BaseServer:
 	def handle_request(self):
 		self.RequestHeaders = self.parse_request()
 		self.command        = self.RequestHeaders['method']
-		self.src            = self.RequestHeaders['requestURL']
+		self.src            = unquote(self.RequestHeaders['requestURL']) # handler chines characters
 		do_command     = 'do_'+ self.command
 		
 		if not hasattr(self,do_command):
@@ -149,8 +149,6 @@ class BaseServer:
 	def translate_path(self, path):
 		# relative path
 		path = '.'+path
-		# chines characters
-		path = unquote(path)
 		# abandon query parameters
 		path = path.split('?',1)[0]
 		path = path.split('#',1)[0]
