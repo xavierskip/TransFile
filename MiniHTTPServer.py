@@ -83,14 +83,14 @@ class BaseServer:
 				self.send_header('server',self.server_version)
 				self.send_header('Date',self.GMT_time())
 				self.end_head()
-				return None
+				return self.response_head
 			else:
 				# response head
 				self.send_response_line(301)
 				self.send_header("Location", self.path + "/")
 				self.end_head()
-				self.content = ''
-				return None
+				self.content = '301'
+				return self.response_head
 		else:
 			# File
 			self.type = self.guess_type()
@@ -100,7 +100,7 @@ class BaseServer:
 				f.close()
 			except IOError:
 				self.send_error(404, "<b>%s</b> not found" %self.src)
-				return None
+				return self.response_head
 			# response head
 			self.send_response_line(200)
 			if self.type: 
@@ -111,7 +111,7 @@ class BaseServer:
 			self.send_header('Date',self.GMT_time())
 			#self.send_header('Last_Modified',)
 			self.end_head()
-			return None
+			return self.response_head
 
 	# response_head
 	def send_response_line(self, status_code):
@@ -212,7 +212,10 @@ class BaseServer:
 		'css': 'text/css',
 		'jpg': 'image.jpeg',
 		'gif': 'image/gif',
-		'swf': 'application/x-shockwave-flash'
+		'swf': 'application/x-shockwave-flash',
+		'rar': 'application/octet-stream',
+		'tar': 'application/octet-stream',
+		'gz':  'application/octet-stream'
 	}
 	Template = '''
 	<!DOCTYPE html>
