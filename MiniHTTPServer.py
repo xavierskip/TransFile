@@ -10,8 +10,8 @@ __version__ = "0.1"
 import socket
 import os
 import time
-import string
-
+from  string  import replace
+from  urllib2 import unquote # for handle chinse characters
 
 class BaseServer:
 	def __init__(self, server_address):
@@ -149,12 +149,12 @@ class BaseServer:
 	def translate_path(self, path):
 		# relative path
 		path = '.'+path
+		# chines characters
+		path = unquote(path)
 		# abandon query parameters
 		path = path.split('?',1)[0]
 		path = path.split('#',1)[0]
-		#path = posixpath.normpath(urllib.unquote(path))  what?
-		#Relative path
-		path = string.replace(path,'..','.')
+		path = replace(path,'..','.')
 		return path
 
 	def directory_page(self):
