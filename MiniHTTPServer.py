@@ -7,22 +7,23 @@ create the a same other wheel
 __version__ = "0.1"
 
 
-import socket
+import socket,sys
 import os
 import time
 from  string  import replace
 from  urllib2 import unquote # for handle chinse characters
 
 class BaseServer:
-	def __init__(self, server_address):
-		self.host = server_address[0]
-		self.port = server_address[1]
+	def __init__(self, host, port, pwd):
+		self.host = host
+		self.port = port
+		self.pwd  = pwd
 		self.socket = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
 
 	def bind(self):
 		self.socket.bind((self.host,self.port))
 		self.socket.listen(5)
-		print 'Server on: http://%s:%d' %(self.host,self.port)
+		print '%s on: http://%s:%d ' %(self.pwd, self.host, self.port)
 
 	def server_forever(self):
 		try:
@@ -147,12 +148,11 @@ class BaseServer:
 		return request_parsed
 
 	def translate_path(self, path):
-		# relative path
-		path = '.'+path
 		# abandon query parameters
 		path = path.split('?',1)[0]
 		path = path.split('#',1)[0]
 		path = replace(path,'..','.')
+		path = self.pwd + path
 		return path
 
 	def directory_page(self):
@@ -279,9 +279,14 @@ class BaseServer:
 		504: ('Gateway Timeout','The gateway server did not receive a timely response'),
 		505: ('HTTP Version Not Supported', 'Cannot fulfill request.'),
 	}
-def test(port=8081):
-	server_address = ('0.0.0.0',port)
-	httpd = BaseServer(server_address)
+def test():
+	if sys.argv[1:]:
+		pwd = sys.argv[1]
+	else:
+		pwd = os.getcwd()
+
+
+	httpd = BaseServer('0.0.0.0',8081,pwd)
 	httpd.bind()
 	httpd.server_forever()
 
