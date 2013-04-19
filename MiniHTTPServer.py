@@ -30,14 +30,18 @@ class BaseServer:
 			while True:
 				conn,addr = self.socket.accept()
 				self.request = conn.recv(2048)
-				response = self.handle_request()
+				try:
+					response = self.handle_request()
+				except Exception, e:
+					print 'unknown request!%s' %e
+					continue
 				print addr[0],'%s %s' %(self.command, self.src)
 				conn.send(response)
 				conn.close()
 		except KeyboardInterrupt, e:
 			self.socket.close()
+			print '\nserver shut down!'
 			exit()
-
 
 	def handle_request(self):
 		self.RequestHeaders = self.parse_request()
@@ -134,16 +138,13 @@ class BaseServer:
 
 	def parse_request(self):
 		request_parsed = {}
-		#print '%r' % self.request.rstrip('\r\n')
 		request_lines = self.request.rstrip('\r\n').split('\r\n')
-		#print request_lines
 		start_line    = request_lines[0].split(' ',2)
 		request_parsed['method']     = start_line[0]
 		request_parsed['requestURL'] = start_line[1]
 		request_parsed['version']    = start_line[2]
 		for i in request_lines[1:]:
 			header = i.split(':',1)
-			#print header
 			request_parsed[header[0]] = header[1]
 		return request_parsed
 
@@ -284,7 +285,6 @@ def test():
 		pwd = sys.argv[1]
 	else:
 		pwd = os.getcwd()
-
 
 	httpd = BaseServer('0.0.0.0',8081,pwd)
 	httpd.bind()
