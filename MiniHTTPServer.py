@@ -40,6 +40,7 @@ class BaseServer:
 				conn.close()
 		except KeyboardInterrupt, e:
 			self.socket.close()
+			self.socket.shutdown(1)
 			print '\nserver shut down!'
 			exit()
 
@@ -223,7 +224,7 @@ class BaseServer:
 	<head>
 		<title>%(title)s</title>
 	</head>
-	<body>
+	<body style="margin: 0 2em;">
 		<p>Directory: <b> %(directory)s</b></p>
 		<hr>
 		%(body)s
