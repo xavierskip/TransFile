@@ -33,7 +33,7 @@ class BaseServer:
 				try:
 					response = self.handle_request()
 				except Exception, e:
-					print 'unknown request!%s' %e
+					print 'unknown request!%s\n%s' %(self.request,e)
 					continue
 				print addr[0],'%s %s' %(self.command, self.src)
 				conn.send(response)
@@ -135,7 +135,6 @@ class BaseServer:
 		return self.content
 
 
-
 	def parse_request(self):
 		request_parsed = {}
 		request_lines = self.request.rstrip('\r\n').split('\r\n')
@@ -146,7 +145,7 @@ class BaseServer:
 		for i in request_lines[1:]:
 			header = i.split(':',1)
 			request_parsed[header[0]] = header[1]
-		return request_parsed
+		return request_parsed	
 
 	def translate_path(self, path):
 		# abandon query parameters
