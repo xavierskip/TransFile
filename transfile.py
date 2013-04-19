@@ -1,10 +1,11 @@
 #!/usr/bin/env python
 #coding:utf-8
 
-""" MiniHTTPServer
-create the a same other wheel
+""" TransFile 
+a mini http server to share file in LAN
+create another wheel
 """
-__version__ = "0.1"
+__version__ = "0.11"
 
 
 import socket,sys

@@ -1,7 +1,7 @@
-MiniHTTPserver
+TransFile 
 ==============
 
-a mini python http server
+a mini http server with python  to share file in LAN
 
 重复造轮子 +  练手
 
