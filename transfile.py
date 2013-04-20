@@ -20,29 +20,25 @@ class BaseServer:
 		self.port = port
 		self.pwd  = pwd
 		self.socket = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
+		self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 
 	def bind(self):
 		self.socket.bind((self.host,self.port))
-		self.socket.listen(5)
+		self.socket.listen(50)
 		print '%s on: http://%s:%d ' %(self.pwd, self.host, self.port)
 
 	def server_forever(self):
-		try:
-			while True:
-				conn,addr = self.socket.accept()
-				self.request = conn.recv(2048)
-				try:
-					response = self.handle_request()
-				except Exception, e:
-					print 'unknown request!%s\n%s' %(self.request,e)
-					continue
-				print addr[0],'%s %s' %(self.command, self.src)
-				conn.send(response)
-				conn.close()
-		except KeyboardInterrupt, e:
-			self.socket.close()
-			print '\nserver shut down!'
-			exit()
+		while True:
+			conn,addr = self.socket.accept()
+			self.request = conn.recv(2048)
+			try:
+				response = self.handle_request()
+			except Exception, e:
+				print 'unknown request!%s\n%s' %(self.request,e)
+				continue
+			print addr[0],'%s %s' %(self.command, self.src)
+			conn.send(response)
+			conn.close()
 
 	def handle_request(self):
 		self.RequestHeaders = self.parse_request()
@@ -93,7 +89,7 @@ class BaseServer:
 			else:
 				# response head
 				self.send_response_line(301)
-				self.send_header("Location", self.path + "/")
+				self.send_header("Location", self.src + "/")
 				self.end_head()
 				self.content = '301'
 				return self.response_head
@@ -105,7 +101,7 @@ class BaseServer:
 				self.content = f.read()
 				f.close()
 			except IOError:
-				self.send_error(404, "<b>%s</b> not found" %self.src)
+				self.send_error(404, '<p><b>%s</b> 404 not found</p><a href="/">return homepage</a>' %self.src)
 				return self.response_head
 			# response head
 			self.send_response_line(200)
@@ -153,8 +149,7 @@ class BaseServer:
 		path = path.split('?',1)[0]
 		path = path.split('#',1)[0]
 		path = replace(path,'..','.')
-		path = self.pwd + path
-		return path
+		return self.pwd + path
 
 	def directory_page(self):
 		def element(inner,tags):
@@ -282,13 +277,21 @@ class BaseServer:
 	}
 def test():
 	if sys.argv[1:]:
-		pwd = sys.argv[1]
+		pwd = os.path.realpath(sys.argv[1])
+		if  not os.path.isdir(pwd):
+			print 'wrong path!'
+			exit()
 	else:
 		pwd = os.getcwd()
+	try:
+		httpd = BaseServer('0.0.0.0',8081,pwd)
+		httpd.bind()
+		httpd.server_forever()
+	except KeyboardInterrupt, e:
+		httpd.socket.close()
+		print '\nserver shut down!'
+		exit()
 
-	httpd = BaseServer('0.0.0.0',8081,pwd)
-	httpd.bind()
-	httpd.server_forever()
 
 if __name__ == '__main__':
 	test()
