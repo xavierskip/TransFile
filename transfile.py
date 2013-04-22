@@ -12,7 +12,7 @@ import socket,sys
 import os
 import time
 from  string  import replace
-from  urllib2 import unquote # for handle chinse characters
+from  urllib2 import unquote # for handle chinese characters
 
 class BaseServer:
 	def __init__(self, host, port, pwd):
@@ -24,7 +24,7 @@ class BaseServer:
 
 	def bind(self):
 		self.socket.bind((self.host,self.port))
-		self.socket.listen(50)
+		self.socket.listen(5)
 		print '%s on: http://%s:%d ' %(self.pwd, self.host, self.port)
 
 	def server_forever(self):
@@ -34,7 +34,7 @@ class BaseServer:
 			try:
 				response = self.handle_request()
 			except Exception, e:
-				print 'unknown request!%s\n%s' %(self.request,e)
+				print 'unknown request:%s\n%s' %(self.request,e)
 				continue
 			print addr[0],'%s %s' %(self.command, self.src)
 			conn.send(response)
@@ -159,7 +159,7 @@ class BaseServer:
 		except os.error:
 			self.send_error(404,'No permission to list directory')
 		list.sort(key=lambda a: a.lower())
-		li = '<li><a href="..">..<a></li>' #back
+		li = '<li><a href="..">返回上一级<a></li>' #back
 		for i in list:
 			if os.path.isdir(self.path+'/'+i):
 				i+='/'
